@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تقويم تشخيصي مبسط</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; margin: 20px; background: #f9f9f9; }
+    .hidden { display: none; }
+    .question { margin: 20px 0; padding: 10px; background: #fff; border-radius: 8px; }
+    button { padding: 10px 20px; margin-top: 10px; border: none; border-radius: 5px; background: #0077cc; color: #fff; cursor: pointer; }
+    button:hover { background: #005fa3; }
+    .result { font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>📏 تقويم تشخيصي: المساحة والمحيط</h2>
+
+  <div id="intro">
+    <label>اسم التلميذ: <input type="text" id="studentName"></label>
+    <button onclick="startTest()">بدء الاختبار</button>
+  </div>
+
+  <div id="quiz" class="hidden"></div>
+
+  <div id="report" class="hidden"></div>
+
+<script>
+const questions = [
+  {
+    text: "مكعب طول حرفه 4cm. ما هو محيطه؟",
+    answer: 48,
+    feedback: "المحيط هو مجموع أطوال الأضلاع: 12 × 4 = 48."
+  },
+  {
+    text: "متوازي مستطيلات أبعاده: 5cm, 3cm, 2cm. ما هي مساحته الكلية؟",
+    answer: 62,
+    feedback: "المساحة الكلية = 2 × (5×3 + 5×2 + 3×2) = 62."
+  },
+  {
+    text: "أسطوانة نصف قطر قاعدتها 3cm وارتفاعها 7cm. ما هي مساحة القاعدة؟ (π≈3.14)",
+    answer: Math.round(3.14 * 3 * 3),
+    feedback: "المساحة = π × r² = 3.14 × 9 ≈ 28.26 → ≈ 28."
+  }
+];
+
+let current = 0;
+let score = 0;
+let student = "";
+
+function startTest() {
+  student = document.getElementById("studentName").value.trim();
+  if (!student) { alert("من فضلك أدخل اسمك"); return; }
+  document.getElementById("intro").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = questions[current];
+  document.getElementById("quiz").innerHTML = `
+    <div class="question">
+      <p><b>السؤال ${current+1}:</b> ${q.text}</p>
+      <input type="number" id="answer">
+      <button onclick="checkAnswer()">تأكيد</button>
+      <div id="feedback"></div>
+    </div>
+  `;
+}
+
+function checkAnswer() {
+  const q = questions[current];
+  const val = Number(document.getElementById("answer").value);
+  const fb = document.getElementById("feedback");
+
+  if (isNaN(val)) { fb.innerHTML = "⚠️ أدخل رقماً صحيحاً"; return; }
+
+  if (Math.abs(val - q.answer) < 0.5) {
+    fb.innerHTML = "✅ صحيح!";
+    score++;
+  } else {
+    fb.innerHTML = "❌ خطأ. " + q.feedback;
+  }
+
+  setTimeout(nextQuestion, 1500);
+}
+
+function nextQuestion() {
+  current++;
+  if (current < questions.length) {
+    showQuestion();
+  } else {
+    endTest();
+  }
+}
+
+function endTest() {
+  document.getElementById("quiz").classList.add("hidden");
+  const report = document.getElementById("report");
+  report.classList.remove("hidden");
+  report.innerHTML = `
+    <h3>📊 تقرير ${student}</h3>
+    <p>النتيجة: ${score} / ${questions.length}</p>
+    <p>${score === questions.length ? "ممتاز! 👏" : "خاصك تراجع بعض القواعد ديال المساحة والمحيط."}</p>
+  `;
+}
+</script>
+</body>
+</html>
